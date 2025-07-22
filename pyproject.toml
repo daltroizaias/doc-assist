@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "doc-assist"
+version = "0.1.0"
+description = ""
+authors = ["daltroizaias <daltroizaias@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+docling = "^2.42.1"
+pydantic-settings = "^2.10.1"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.30.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
