@@ -8,6 +8,7 @@ class Settings(BaseSettings):
      DATABASE_URI: str
      INPUT_FILE: str
      OUTPUT_FILE: str
+     VECTOR_HOST: str
 
 
 settings = Settings()
