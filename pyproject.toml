@@ -9,6 +9,8 @@ readme = "README.md"
 python = "^3.12"
 docling = "^2.42.1"
 pydantic-settings = "^2.10.1"
+markdown = "^3.8.2"
+beautifulsoup4 = "^4.13.4"
 
 
 [tool.poetry.group.dev.dependencies]
