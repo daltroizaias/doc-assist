@@ -12,10 +12,12 @@ pydantic-settings = "^2.10.1"
 markdown = "^3.8.2"
 beautifulsoup4 = "^4.13.4"
 qdrant-client = "^1.15.0"
+fastembed = "^0.7.1"
 
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.30.0"
+ruff = "^0.12.5"
 
 [build-system]
 requires = ["poetry-core"]
