@@ -1,19 +1,19 @@
 # %%
-from datetime import datetime
 import os
+import uuid
+from datetime import datetime
 from typing import Iterator
-from docling.document_converter import DocumentConverter
-from docling.chunking import HybridChunker
 
+from docling.chunking import HybridChunker
+from docling.document_converter import DocumentConverter
+from docling_core.transforms.chunker import BaseChunk
 from fastembed import TextEmbedding
 from pydantic import BaseModel
 from qdrant_client import QdrantClient
-from tqdm import tqdm
+from qdrant_client.http.models import Distance, PointStruct, VectorParams
 from settings import settings
-from qdrant_client.http.models import PointStruct, VectorParams, Distance
+from tqdm import tqdm
 
-from docling_core.transforms.chunker import BaseChunk
-import uuid
 
 # %%
 class VectorConfig(BaseModel):
@@ -28,7 +28,7 @@ class Ingestor:
         self.qdrant = QdrantClient(
             url=settings.VECTOR_HOST,
             check_compatibility=False,
-            )
+        )
         self.root_files = root_files
 
     def create_collection(self):
@@ -36,19 +36,21 @@ class Ingestor:
             self.qdrant.create_collection(
                 collection_name=self.vector_config.collection_name,
                 vectors_config=VectorParams(
-                    size=self.vector_config.max_tokens, distance=Distance.COSINE
+                    size=self.vector_config.max_tokens,
+                    distance=Distance.COSINE,
                 ),
-                timeout=5000
+                timeout=5000,
             )
 
         except Exception as err:
-            if "already exists" not in str(err):
-                print(f"Erro ao criar coleção: {err}")
+            if 'already exists' not in str(err):
+                print(f'Erro ao criar coleção: {err}')
                 raise
-            print(f"Coleção {self.vector_config.collection_name} já existe")
+            print(f'Coleção {self.vector_config.collection_name} já existe')
 
-        return print(f"Coleção {self.vector_config.collection_name} pronta para uso")
-
+        return print(
+            f'Coleção {self.vector_config.collection_name} pronta para uso'
+        )
 
     def chunker_data(self, file: str) -> Iterator[BaseChunk]:
         # Leitura do Documento
@@ -66,19 +68,23 @@ class Ingestor:
     def embedding_processor(self, file: str) -> list[PointStruct]:
         chunk_iter = self.chunker_data(file)
         # Embedding dos chunks
-        dense_model = TextEmbedding(model_name=self.vector_config.chunker_tokenizer)
+        dense_model = TextEmbedding(
+            model_name=self.vector_config.chunker_tokenizer
+        )
 
         points: list[PointStruct] = []
         for i in chunk_iter:
             # Embbedding do chunk
-            dense_embedding = list(dense_model.passage_embed([i.text]))[0].tolist()
+            dense_embedding = list(dense_model.passage_embed([i.text]))[
+                0
+            ].tolist()
 
             payload = {
-                "text": i.text,
+                'text': i.text,
                 'model_embedding': self.vector_config.chunker_tokenizer,
-                "source_file": os.path.basename(file),
-                "ingestion_date": datetime.now().isoformat(),
-                "data_collection_date": file,
+                'source_file': os.path.basename(file),
+                'ingestion_date': datetime.now().isoformat(),
+                'data_collection_date': file,
             }
 
             # Organiza no formato do vector database
@@ -101,7 +107,7 @@ class Ingestor:
             progress_bar = tqdm(files)
             for file in progress_bar:
                 progress_bar.set_description(
-                    f"Processando arquivo {os.path.basename(file)}"
+                    f'Processando arquivo {os.path.basename(file)}'
                 )
 
                 # Cria os chunks e retorna o embedding dos dados
@@ -114,22 +120,18 @@ class Ingestor:
                     wait=True,
                 )
             return print(
-                f"Processo concluído, adicionado {len(files)} ao banco de dados"
+                f'Processo concluído, adicionado {len(files)} ao banco de dados'  # noqa: E501
             )
 
 
 # %%
 vector_config = VectorConfig(
-    chunker_tokenizer="BAAI/bge-base-en-v1.5",
+    chunker_tokenizer='BAAI/bge-base-en-v1.5',
     max_tokens=512,
-    collection_name="teste_collection",
+    collection_name='teste_collection',
 )
 file_path = settings.OUTPUT_FILE
 ingestor = Ingestor(vector_config=vector_config, root_files=file_path)
 
 ingestor.run()
 # %%
-
-
-
-
