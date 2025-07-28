@@ -1,7 +1,10 @@
 # %%
 import os
 
-from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.datamodel.settings import settings as docling_settings
+from docling.document_converter import DocumentConverter, PdfFormatOption
 from settings import settings
 from tqdm import tqdm
 
@@ -10,20 +13,34 @@ ROOT_PDF = settings.INPUT_FILE
 
 
 # %%
+
+
+
 def load_save_file(file: str) -> str:
     """
     Carrega os dados PDF e os tranforma em Markdown e os salva na pasta
     """
+    pipeline_options = PdfPipelineOptions(
+        do_table_structure=True,
+        generate_picture_images=True,
+    )
+    docling_settings.debug.profile_pipeline_timings = True
+
     print('convertendo')
-    converter = DocumentConverter()
+    converter = DocumentConverter(
+        format_options={
+            InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+        },
+        
+    )
     result = converter.convert(file)
 
     file_name_orig = os.path.basename(file)
     file_name_cor = os.path.join(ROOT_MD, file_name_orig + '.md')
 
     print('salvando')
-    with open(os.path.join(file_name_cor), 'w', encoding='utf-8') as file:
-        file.write(result.document.export_to_markdown())
+    with open(os.path.join(file_name_cor), 'w', encoding='utf-8') as md_file:
+        md_file.write(result.document.export_to_markdown())
 
     return result
 
@@ -46,7 +63,7 @@ def verificador(pasta_pdf: str, pasta_markdown: str):
     return file_unique
 
 
-def run():
+def run(teste: bool = False):
     files = verificador(ROOT_PDF, ROOT_MD)
     progress_bar = tqdm(files)
     for file in progress_bar:
@@ -56,6 +73,9 @@ def run():
 
         load_save_file(file=os.path.join(ROOT_PDF, file))
 
+        if teste is True:
+            break
+
 
 if __name__ == '__main__':
-    run()
+    run(teste=True)

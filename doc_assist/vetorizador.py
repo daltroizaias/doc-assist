@@ -125,13 +125,15 @@ class Ingestor:
 
 
 # %%
-vector_config = VectorConfig(
-    chunker_tokenizer='BAAI/bge-base-en-v1.5',
-    max_tokens=512,
-    collection_name='teste_collection',
-)
-file_path = settings.OUTPUT_FILE
-ingestor = Ingestor(vector_config=vector_config, root_files=file_path)
 
-ingestor.run()
+if __name__ == '__main__':
+    vector_config = VectorConfig(
+        chunker_tokenizer='BAAI/bge-base-en-v1.5',
+        max_tokens=512,
+        collection_name='teste_collection',
+    )
+    file_path = settings.OUTPUT_FILE
+    ingestor = Ingestor(vector_config=vector_config, root_files=file_path)
+
+    ingestor.run()
 # %%
