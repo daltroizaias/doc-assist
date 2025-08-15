@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     INPUT_FILE: str
     OUTPUT_FILE: str
     VECTOR_HOST: str
+    GROQ_API_KEY: str
 
 
 settings = Settings()

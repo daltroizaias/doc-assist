@@ -22,6 +22,7 @@ def load_save_file(file: str) -> str:
     """
     pipeline_options = PdfPipelineOptions(
         do_table_structure=True,
+        do_code_enrichment=True,
         generate_picture_images=True,
     )
     docling_settings.debug.profile_pipeline_timings = True
@@ -31,7 +32,7 @@ def load_save_file(file: str) -> str:
         format_options={
             InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
         },
-        
+
     )
     result = converter.convert(file)
 
